@@ -15,7 +15,7 @@ export default function Message({ message, onClose }) {
   const maxLength = 255;
   const handleSend = async () => {
     try {
-      const res = await fetch(`${process.env.Backend_url}/api/messages`, {
+      const res = await fetch('https://sendproject-production.up.railway.app/api/messages', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ from, to, message: messageText }),
