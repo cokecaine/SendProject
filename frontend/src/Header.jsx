@@ -21,7 +21,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <img src="/logo.svg" alt="Logo" className="h-10 w-auto" />
           <span className="text-lg font-semibold text-gray-800">
-            Sesandwich
+            SendProject
           </span>
         </div>
 
@@ -46,7 +46,7 @@ export default function Header() {
 
       {/* Mobile */}
       <div className="md:hidden w-full px-4 py-4 flex justify-between items-center bg-[#1d262d]">
-        <span className="text-white font-bold text-lg">Sesandwich</span>
+        <span className="text-white font-bold text-lg">SendProject</span>
         <button onClick={() => setIsOpen(!isOpen)} className="text-white">
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>

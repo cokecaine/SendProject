@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from 'axios';
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour : "2-digit",
+    minute: "2-digit",
+  });
+};
 
 export default function Wallpage() {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [allMessages, setAllMessages] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const currentPage = parseInt(searchParams.get("page") || "1");
   const itemsPerPage = 20;
@@ -14,34 +27,41 @@ export default function Wallpage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const queryParam = searchParams.get("query")?.toLowerCase() || "";
+  const queryParam = searchParams.get("query") ? searchParams.get("query").toLowerCase() : "";
 
-  const filteredMessages = allMessages.filter(
-    (msg) =>
+  const filteredMessages = allMessages
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .filter(
+      (msg) =>
       msg.from.toLowerCase().includes(queryParam) ||
       msg.to.toLowerCase().includes(queryParam)
-  );
+      );
 
   const totalPages = Math.ceil(filteredMessages.length / itemsPerPage);
   const currentMessages = filteredMessages.slice(startIndex, endIndex);
 
+  const fetchMessages = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await axios.get('http://localhost:3000/api/messages');
+      setAllMessages(res.data);
+    } catch (error) {
+      setError("Failed to fetch messages. Please try again.");
+      console.error("❌ Failed to fetch messages:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch('https://sendproject-production.up.railway.app/api/messages');
-        const data = await res.json();
-        setAllMessages(data);
-      } catch (error) {
-        console.error("❌ Failed to fetch messages:", error);
-      }
-    };
-
-    fetchMessages();
-  }, []);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -209,7 +229,7 @@ export default function Wallpage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-8">
           {currentMessages.map((message, i) => (
             <motion.div
-              key={message.id}
+              key={message._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}

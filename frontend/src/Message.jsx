@@ -1,34 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const maxLength = 255;
+const sanitizeInput = (input) => {
+  if (input.length > maxLength) {
+    return input.slice(0, maxLength);
+  }
+  return input;
+};
 
 export default function Message({ message, onClose }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [messageText, setMessageText] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const maxLength = 255;
   const handleSend = async () => {
     try {
-      const res = await fetch('https://sendproject-production.up.railway.app/api/messages', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to, message: messageText }),
-      });
+      setIsLoading(true);
+      setError(null);
 
-      if (res.ok) {
-        console.log("✅ Message sent!");
-        navigate("/feed");
-      } else {
-        console.error("❌ Failed to send");
+      // Input validation
+      if (!from.trim() || !to.trim() || !messageText.trim()) {
+        console.error("❌ All fields are required");
+        return;
       }
+
+      const res = await axios.post(
+        'http://localhost:3000/api/messages',
+        { from, to, message: messageText },
+        { headers: {"Content-Type": "application/json"}}
+      );
+      console.log("✅ Message sent successfully:");
+      navigate("/feed");
     } catch (err) {
-      console.error(err);
+      setError(err.response?.data?.error || "Failed to send message. Please try again.");
+      console.error("❌ Failed to send message:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,10 +66,15 @@ export default function Message({ message, onClose }) {
         treat them with the care they deserve. Your identity stays hidden. Your
         words stay yours. Nothing is tracked, nothing is shared. Only the
         message is delivered — quietly, respectfully, privately.
+        {error && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
       </div>
 
       <div className="max-w-4xl w-full bg-zinc-800 rounded-3xl mt-10 mx-auto p-6 md:p-10">
-        <form className="space-y-8">
+        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
           {/* From */}
           <div className="flex flex-col space-y-2">
             <label
@@ -63,7 +85,7 @@ export default function Message({ message, onClose }) {
             </label>
             <input
               value={from}
-              onChange={(e) => setFrom(e.target.value)}
+              onChange={(e) => setFrom(sanitizeInput(e.target.value))}
               id="from"
               type="text"
               placeholder="Your name"
@@ -81,7 +103,7 @@ export default function Message({ message, onClose }) {
             </label>
             <input
               value={to}
-              onChange={(e) => setTo(e.target.value)}
+              onChange={(e) => setTo(sanitizeInput(e.target.value))}
               id="to"
               type="text"
               placeholder="Who you want to send a message to"
@@ -99,7 +121,7 @@ export default function Message({ message, onClose }) {
             </label>
             <textarea
               value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
+              onChange={(e) => setMessageText(sanitizeInput(e.target.value))}
               id="message"
               placeholder="Write your message here..."
               rows={6}
@@ -116,9 +138,11 @@ export default function Message({ message, onClose }) {
             <button
               type="button"
               onClick={handleSend}
-              className="bg-zinc-800 text-white px-6 py-3 rounded-full text-lg md:text-2xl font-semibold font-['Poppins'] hover:bg-zinc-700 transition-colors"
+              disabled={isLoading}
+              className={`bg-zinc-800 text-white px-6 py-3 rounded-full text-lg md:text-2xl font-semibold font-['Poppins'] hover:bg-zinc-700 transition-colors ${
+                isLoading ? 'opcacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'}`}
             >
-              Send
+              {isLoading ? "Sending..." : "Send Message"}
             </button>
           </div>
         </form>
