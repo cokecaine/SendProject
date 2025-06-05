@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Message = require("../models/message"); // ✅ pastikan path-nya benar
+const { validateMessage } = require("../middleware/validate");
 
 router.get("/", async (req, res) => {
   try {
@@ -11,7 +12,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", validateMessage, async (req, res) => {
   const { from, to, message } = req.body;
   try {
     const newMessage = new Message({ from, to, message });
