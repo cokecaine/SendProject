@@ -52,5 +52,3 @@ mongoose
     console.error("❌ MongoDB error:", err)
     process.exit(1);
   });
-
-module.exports = { validateEnv, validateMessage };
