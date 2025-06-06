@@ -45,7 +45,7 @@ export default function Wallpage() {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await axios.get('http://localhost:3000/api/messages');
+      const res = await axios.get('https://sendproject-production.up.railway.app/api/messages');
       setAllMessages(res.data);
     } catch (error) {
       setError("Failed to fetch messages. Please try again.");

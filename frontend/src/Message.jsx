@@ -35,7 +35,7 @@ export default function Message({ message, onClose }) {
       }
 
       const res = await axios.post(
-        'http://localhost:3000/api/messages',
+        'https://sendproject-production.up.railway.app/api/messages',
         { from, to, message: messageText },
         { headers: {"Content-Type": "application/json"}}
       );
