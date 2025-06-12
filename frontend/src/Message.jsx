@@ -30,19 +30,20 @@ export default function Message({ message, onClose }) {
 
       // Input validation
       if (!from.trim() || !to.trim() || !messageText.trim()) {
-        console.error("❌ All fields are required");
+        setError("All fields are required");
         return;
       }
 
-      const res = await axios.post(
+      await axios.post(
         'https://sendproject-production.up.railway.app/api/messages',
         { from, to, message: messageText },
         { headers: {"Content-Type": "application/json"}}
       );
-      console.log("✅ Message sent successfully:");
+
+      console.log("✅ Message sent successfully");
       navigate("/feed");
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to send message. Please try again.");
+      setError(err.response?.data?.error || "Failed to send message");
       console.error("❌ Failed to send message:", err);
     } finally {
       setIsLoading(false);
@@ -140,7 +141,7 @@ export default function Message({ message, onClose }) {
               onClick={handleSend}
               disabled={isLoading}
               className={`bg-zinc-800 text-white px-6 py-3 rounded-full text-lg md:text-2xl font-semibold font-['Poppins'] hover:bg-zinc-700 transition-colors ${
-                isLoading ? 'opcacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'}`}
+                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'}`}
             >
               {isLoading ? "Sending..." : "Send Message"}
             </button>

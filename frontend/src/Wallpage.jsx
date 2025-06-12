@@ -45,11 +45,11 @@ export default function Wallpage() {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await axios.get('https://sendproject-production.up.railway.app/api/messages');
+      const res = await axios.get('https://sendproject-production.up.railway.app/api/messages'); // Update this URL
       setAllMessages(res.data);
-    } catch (error) {
-      setError("Failed to fetch messages. Please try again.");
-      console.error("❌ Failed to fetch messages:", error);
+    } catch (err) {
+      setError('Failed to fetch messages. Please try again later.');
+      console.error("❌ Failed to fetch messages:", err);
     } finally {
       setIsLoading(false);
     }

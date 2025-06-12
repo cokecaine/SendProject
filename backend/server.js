@@ -23,7 +23,16 @@ const PORT = process.env.PORT ;
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:3000",
+    "https://send-project-o3z58xzn8-cokecaines-projects.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json({limit: "25kb"}));
 
 const limiter = rateLimit({
@@ -52,3 +61,18 @@ mongoose
     console.error("❌ MongoDB error:", err)
     process.exit(1);
   });
+
+const validateMessage = (req, res, next) => {
+  const { from, to, message } = req.body;
+
+  // Add optional chaining to all fields
+  if (!from?.trim() || !to?.trim() || !message?.trim()) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+
+  if (message.length > 255) {
+    return res.status(400).json({ error: "Message too long" });
+  }
+
+  next();
+};
