@@ -35,12 +35,13 @@ export default function Message({ message, onClose }) {
         return;
       }
 
+      // Simple request without API key
       await axios.post(
         `${config.API_URL}/messages`,
         { from, to, message: messageText },
-        { headers: {"Content-Type": "application/json",
-          "x-api-key": config.API_KEY
-        }}
+        { 
+          headers: {"Content-Type": "application/json"}
+        }
       );
 
       console.log("✅ Message sent successfully");
@@ -66,16 +67,18 @@ export default function Message({ message, onClose }) {
       </div>
 
       <div className="mx-auto max-w-4xl text-center text-black text-base md:text-xl font-semibold font-['Poppins'] leading-relaxed">
-        We know that some messages carry pieces of your heart. That’s why we
+        We know that some messages carry pieces of your heart. That's why we
         treat them with the care they deserve. Your identity stays hidden. Your
         words stay yours. Nothing is tracked, nothing is shared. Only the
         message is delivered — quietly, respectfully, privately.
-        {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
       </div>
+
+      {/* Error display moved outside the description */}
+      {error && (
+        <div className="max-w-4xl mx-auto mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
 
       <div className="max-w-4xl w-full bg-zinc-800 rounded-3xl mt-10 mx-auto p-6 md:p-10">
         <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
@@ -144,7 +147,8 @@ export default function Message({ message, onClose }) {
               onClick={handleSend}
               disabled={isLoading}
               className={`bg-zinc-800 text-white px-6 py-3 rounded-full text-lg md:text-2xl font-semibold font-['Poppins'] hover:bg-zinc-700 transition-colors ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'}`}
+                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'
+              }`}
             >
               {isLoading ? "Sending..." : "Send Message"}
             </button>
