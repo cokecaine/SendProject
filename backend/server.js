@@ -18,7 +18,7 @@ const validateEnv = () => {
 };
 validateEnv();
 
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(helmet());
@@ -39,7 +39,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
   message: "Too many requests from this IP, please try again later.",
-})
+});
 app.use(limiter);
 
 app.use("/api/messages", messageRoutes);
@@ -52,12 +52,12 @@ app.use((err, req, res, next) => {
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB connected successfully")
+    console.log("✅ MongoDB connected successfully");
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("❌ MongoDB error:", err)
+    console.error("❌ MongoDB error:", err);
     process.exit(1);
   });
