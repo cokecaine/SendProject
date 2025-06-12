@@ -26,7 +26,8 @@ app.use(cors({
   origin: [
     "http://localhost:5173", 
     "http://localhost:3000",
-    "https://send-project-o3z58xzn8-cokecaines-projects.vercel.app"
+    "https://send-project-o3z58xzn8-cokecaines-projects.vercel.app",
+    "https://www.sendproject.fun",
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
