@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const Message = require("../models/message"); // ✅ pastikan path-nya benar
+const Message = require("../models/message");
 const { validateMessage } = require("../middleware/validate");
-const { validateApiKey } = require("../middleware/apiKey");
 
-router.get("/", validateApiKey, async (req, res) => {
+// ✅ NO validateApiKey here
+router.get("/", async (req, res) => {
   try {
-    const messages = await Message.find().sort({ createdAt: -1 }); // Add sorting
+    const messages = await Message.find().sort({ createdAt: -1 });
     console.log(`✅ Fetched ${messages.length} messages`);
     res.status(200).json(messages);
   } catch (err) {
@@ -15,7 +15,8 @@ router.get("/", validateApiKey, async (req, res) => {
   }
 });
 
-router.post("/", validateApiKey, validateMessage, async (req, res) => {
+// ✅ NO validateApiKey here
+router.post("/", validateMessage, async (req, res) => {
   const { from, to, message } = req.body;
   try {
     const newMessage = new Message({ from, to, message });
