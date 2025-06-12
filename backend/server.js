@@ -19,7 +19,6 @@ const validateEnv = () => {
 validateEnv();
 
 const PORT = process.env.PORT ;
-
 const app = express();
 
 app.use(helmet());
@@ -61,18 +60,3 @@ mongoose
     console.error("❌ MongoDB error:", err)
     process.exit(1);
   });
-
-const validateMessage = (req, res, next) => {
-  const { from, to, message } = req.body;
-
-  // Add optional chaining to all fields
-  if (!from?.trim() || !to?.trim() || !message?.trim()) {
-    return res.status(400).json({ error: "All fields are required." });
-  }
-
-  if (message.length > 255) {
-    return res.status(400).json({ error: "Message too long" });
-  }
-
-  next();
-};
