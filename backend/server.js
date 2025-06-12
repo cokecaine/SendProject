@@ -6,10 +6,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const messageRoutes = require("./Routes/message");
-const { validateMessage } = require("./middleware/validate");
 
 const validateEnv = () => {
-  const required = ["MONGO_URI", "PORT"];
+  const required = ["MONGO_URI", "API_KEY"];
   for (const key of required) {
     if (!process.env[key]){
       throw new Error(`❌ Missing environment variable: ${key}`);
@@ -31,14 +30,18 @@ app.use(cors({
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-API-Key"]
 }));
 app.use(express.json({limit: "25kb"}));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
+  max: 50, // Reduce from 100 to 50
+  message: {
+    error: "Too many requests from this IP, please try again after 15 minutes."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 app.use(limiter);
 
@@ -47,6 +50,11 @@ app.use("/api/messages", messageRoutes);
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
   res.status(500).json({ error: "Internal Server Error" });
+});
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${req.ip}`);
+  next();
 });
 
 mongoose

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import config from "./config";
 
 const maxLength = 255;
 const sanitizeInput = (input) => {
@@ -35,9 +36,11 @@ export default function Message({ message, onClose }) {
       }
 
       await axios.post(
-        'https://sendproject-production.up.railway.app/api/messages',
+        `${config.API_URL}/messages`,
         { from, to, message: messageText },
-        { headers: {"Content-Type": "application/json"}}
+        { headers: {"Content-Type": "application/json",
+          "x-api-key": config.API_KEY
+        }}
       );
 
       console.log("✅ Message sent successfully");
